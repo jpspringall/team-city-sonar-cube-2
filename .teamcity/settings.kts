@@ -145,8 +145,6 @@ object DeployBuild : BuildType({
     printDeployNumber()
 
     triggers {
-        vcs {
-        }
     }
 
     features {}
