@@ -3,3 +3,4 @@
 xml-loose
 
 testy mc test
+pr test
