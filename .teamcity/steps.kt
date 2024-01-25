@@ -115,6 +115,9 @@ object CommonSteps {
                 cat ./sonar-qube-test/README.md
                 echo "Output private-https-test:"
                 cat ./private-https-test/README.md
+                cd ./private-https-test
+                git status
+                cd ..
             """.trimIndent()
             }
         }
