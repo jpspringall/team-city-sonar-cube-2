@@ -189,7 +189,7 @@ for (bt : BuildType in project.buildTypes ) {
         bt.vcs.root(DslContext.settingsRoot.id!!, "+:. => ./sonar-qube-test")
         var vcsRootName = "Blah"
         val vcsRootNameParam = bt.params.findRawParam("https.private.root")
-        if (vcsRootNameParam == null || vcsRootNameParam.value.isBlank()) {
+        if (vcsRootNameParam != null && vcsRootNameParam.value.isNotBlank()) {
             vcsRootName = vcsRootNameParam!!.value
         }
         bt.vcs.root(AbsoluteId(vcsRootName), "+:. => ./private-https-test")
