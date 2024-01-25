@@ -110,6 +110,7 @@ object CommonSteps {
                 echo "Running deployment"
                 counter=%build.counter%
                 echo "Counter is: ${'$'}counter"
+                ls
             """.trimIndent()
             }
         }
