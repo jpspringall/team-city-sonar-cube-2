@@ -115,7 +115,6 @@ object CommonSteps {
                 cat ./sonar-qube-test/README.md
                 echo "Output private-https-test:"
                 cat ./private-https-test/README.md
-        bt.vcs.root(AbsoluteId("RootTeamCitySonarCubeProject_TeamCitySonarPrivateHttps"), "+:. => ./private-https-test")
             """.trimIndent()
             }
         }
