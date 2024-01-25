@@ -186,8 +186,9 @@ for (bt : BuildType in project.buildTypes ) {
 
     if (bt.name == "Deploy Build") {
 
+
         bt.vcs.root(DslContext.settingsRoot.id!!, "+:. => ./sonar-qube-test")
-        var vcsRootName = "Blah"
+        var vcsRootName = "RootTeamCitySonarCubeProject_TeamCitySonarPrivateHttps"
         val vcsRootNameParam = bt.params.findRawParam("https.private.root")
         if (vcsRootNameParam != null && vcsRootNameParam.value.isNotBlank()) {
             vcsRootName = vcsRootNameParam!!.value
