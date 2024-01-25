@@ -187,7 +187,7 @@ for (bt : BuildType in project.buildTypes ) {
     if (bt.name == "Deploy Build")
     {
         bt.vcs.root(DslContext.settingsRoot.id!!, "+:. => ./sonar-qube-test")
-        bt.vcs.root(AbsoluteId("RootTeamCitySonarCubeProject_TeamCitySonarPrivateHttps"), "+:. => ./private-https-test")
+        bt.vcs.root(AbsoluteId("%https.private.root%"), "+:. => ./private-https-test")
     }
 
 //    if (bt.name == "Pull Request Build" || bt.name == "Master Build")
