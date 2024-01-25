@@ -186,8 +186,9 @@ for (bt : BuildType in project.buildTypes ) {
 
     if (bt.name == "Deploy Build")
     {
+        val vcsRootName = "%https.private.root%"
         bt.vcs.root(DslContext.settingsRoot.id!!, "+:. => ./sonar-qube-test")
-        bt.vcs.root(AbsoluteId("%https.private.root%"), "+:. => ./private-https-test")
+        bt.vcs.root(AbsoluteId(vcsRootName), "+:. => ./private-https-test")
     }
 
 //    if (bt.name == "Pull Request Build" || bt.name == "Master Build")
