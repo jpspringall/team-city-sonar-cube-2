@@ -184,11 +184,16 @@ for (bt : BuildType in project.buildTypes ) {
         }
     }
 
-    if (bt.name == "Deploy Build")
-    {
-        val vcsRootName = bt.params.findRawParam("https.private.root")
+    if (bt.name == "Deploy Build") {
+
         bt.vcs.root(DslContext.settingsRoot.id!!, "+:. => ./sonar-qube-test")
-        bt.vcs.root(AbsoluteId(vcsRootName!!.value), "+:. => ./private-https-test")
+        var vcsRootName = "Blah"
+        val vcsRootNameParam = bt.params.findRawParam("https.private.root")
+        if (vcsRootNameParam == null || vcsRootNameParam.value.isBlank()) {
+            vcsRootName = vcsRootNameParam!!.value
+        }
+        bt.vcs.root(AbsoluteId(vcsRootName), "+:. => ./private-https-test")
+
     }
 
 //    if (bt.name == "Pull Request Build" || bt.name == "Master Build")
