@@ -5,6 +5,7 @@ import CommonSteps.printDeployNumber
 import CommonSteps.printPullRequestNumber
 import CommonSteps.runMakeTest
 import CommonSteps.runSonarScript
+import jetbrains.buildServer.configs.kotlin.AbsoluteId
 import jetbrains.buildServer.configs.kotlin.BuildType
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.FailureAction
@@ -182,6 +183,13 @@ for (bt : BuildType in project.buildTypes ) {
             }
         }
     }
+
+    if (bt.name == "Deploy Build")
+    {
+        bt.vcs.root(DslContext.settingsRoot.id!!, "+:. => ./sonar-qube-test")
+        bt.vcs.root(AbsoluteId("RootTeamCitySonarCubeProject_TeamCitySonarPrivateHttps"), "+:. => ./private-https-test")
+    }
+
 //    if (bt.name == "Pull Request Build" || bt.name == "Master Build")
 //    {
 //        bt.features.add {  xmlReport {
