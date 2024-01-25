@@ -111,6 +111,11 @@ object CommonSteps {
                 counter=%build.counter%
                 echo "Counter is: ${'$'}counter"
                 ls
+                echo "Output sonar-qube-test:"
+                cat ./sonar-qube-test/README.md
+                echo "Output private-https-test:"
+                cat ./private-https-test/README.md
+        bt.vcs.root(AbsoluteId("RootTeamCitySonarCubeProject_TeamCitySonarPrivateHttps"), "+:. => ./private-https-test")
             """.trimIndent()
             }
         }
