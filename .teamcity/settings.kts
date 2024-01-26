@@ -10,6 +10,7 @@ import jetbrains.buildServer.configs.kotlin.BuildType
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.FailureAction
 import jetbrains.buildServer.configs.kotlin.Project
+import jetbrains.buildServer.configs.kotlin.RelativeId
 import jetbrains.buildServer.configs.kotlin.buildFeatures.PullRequests
 import jetbrains.buildServer.configs.kotlin.buildFeatures.commitStatusPublisher
 import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
@@ -128,7 +129,7 @@ object PullRequestBuild : BuildType({
 val deployBuild = BuildType{
 
     name = "Deploy Build"
-    id = AbsoluteId("Deploy Build".toId())
+    id = RelativeId("Deploy Build".toId())
 
 
     vcs {
