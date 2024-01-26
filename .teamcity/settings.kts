@@ -14,6 +14,7 @@ import jetbrains.buildServer.configs.kotlin.buildFeatures.PullRequests
 import jetbrains.buildServer.configs.kotlin.buildFeatures.commitStatusPublisher
 import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
 import jetbrains.buildServer.configs.kotlin.project
+import jetbrains.buildServer.configs.kotlin.toId
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.ui.add
 import jetbrains.buildServer.configs.kotlin.version
@@ -127,6 +128,8 @@ object PullRequestBuild : BuildType({
 val deployBuild = BuildType{
 
     name = "Deploy Build"
+    id = AbsoluteId("Deploy Build".toId())
+
 
     vcs {
         root(DslContext.settingsRoot)
