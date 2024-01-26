@@ -100,22 +100,23 @@ object CommonSteps {
         }
     }
 
-    fun BuildType.printDeployNumber(
-    ) {
+    fun BuildType.printDeployNumber(workingDirectory: String)
+     {
         steps {
             script {
                 name = "Print Deploy Number teamcity-sonar"
+                workingDir = workingDirectory
                 scriptContent = """
                 #!/bin/bash
                 echo "Running deployment"
                 counter=%build.counter%
                 echo "Counter is: ${'$'}counter"
-                ls
+                ls ..
                 echo "Output sonar-qube-test:"
-                cat ./sonar-qube-test/README.md
+                cat ./README.md
                 echo "Output private-https-test:"
-                cat ./private-https-test/README.md
-                cd ./private-https-test
+                cat ../private-https-test/README.md
+                cd ../private-https-test
                 git status
                 cd ..
             """.trimIndent()

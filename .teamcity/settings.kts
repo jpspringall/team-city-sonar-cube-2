@@ -42,6 +42,8 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 
 version = "2023.11"
 
+val mainCheckoutDirectory = "./sonar-qube-test"
+
 object MasterBuild : BuildType({
     name = "Master Build"
 
@@ -119,7 +121,11 @@ object PullRequestBuild : BuildType({
     }
 })
 
-object DeployBuild : BuildType({
+// Doing this, fixes this error: Kotlin:
+// Object DeployBuild captures the script class instance. Try to use class or anonymous object instead
+// https://stackoverflow.com/questions/17516930/how-to-create-an-instance-of-anonymous-class-of-abstract-class-in-kotlin
+val deployBuild = BuildType{
+
     name = "Deploy Build"
 
     vcs {
@@ -144,19 +150,19 @@ object DeployBuild : BuildType({
 
     createParameters()
 
-    printDeployNumber()
+    printDeployNumber(mainCheckoutDirectory)
 
     triggers {
     }
 
     features {}
-})
+}
 
 val builds: ArrayList<BuildType> = arrayListOf()
 
 builds.add(MasterBuild)
 builds.add(PullRequestBuild)
-builds.add(DeployBuild)
+builds.add(deployBuild)
 
 val project = Project {
     builds.forEach{
@@ -188,8 +194,8 @@ for (bt : BuildType in project.buildTypes ) {
     if (bt.name == "Deploy Build") {
 
 
-        bt.vcs.root(DslContext.settingsRoot.id!!, "+:. => ./sonar-qube-test")
-        var vcsRootName = "RootTeamCitySonarCubeProject_TeamCitySonarPrivateHttps"
+        bt.vcs.root(DslContext.settingsRoot.id!!, "+:. => $mainCheckoutDirectory")
+        val vcsRootName = "RootTeamCitySonarCubeProject_TeamCitySonarPrivateHttps"
         bt.vcs.root(AbsoluteId(vcsRootName), "+:. => ./private-https-test")
 
     }
