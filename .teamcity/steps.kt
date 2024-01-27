@@ -131,8 +131,13 @@ object CommonSteps {
                 name = "Move $workingDirectory"
                 scriptContent = """
                 #!/bin/bash
+                
+                # https://stackoverflow.com/questions/20192070/how-to-move-all-files-including-hidden-files-into-parent-directory-via
                 ls
-                mv -v $workingDirectory/ ..
+                mv .$workingDirectory/{.[!.],}* ./
+                ls
+                rm -rf .$workingDirectory
+                ls
             """.trimIndent()
             }
 
