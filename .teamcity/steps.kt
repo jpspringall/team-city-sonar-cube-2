@@ -124,19 +124,20 @@ object CommonSteps {
         }
     }
 
-    fun BuildType.printAndMoveDeployNumber(workingDirectory: String)
+    fun BuildType.printAndMoveDeployNumber()
     {
         steps {
             script {
-                name = "Move $workingDirectory"
+                name = "Move workingDirectory"
+                enabled = false
                 scriptContent = """
                 #!/bin/bash
                 
                 # https://stackoverflow.com/questions/20192070/how-to-move-all-files-including-hidden-files-into-parent-directory-via
                 ls
-                mv $workingDirectory/{.[!.],}* ./
+                mv workingDirectory/{.[!.],}* ./
                 ls
-                rm -rf .$workingDirectory
+                rm -rf workingDirectory
                 ls
                  git status
             """.trimIndent()
