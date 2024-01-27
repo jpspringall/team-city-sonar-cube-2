@@ -46,8 +46,10 @@ version = "2023.11"
 
 val mainCheckoutDirectory = "./sonar-qube-test"
 
-object MasterBuild : BuildType({
-    name = "Master Build"
+val masterBuild = BuildType{
+val buildTypeName = "Master Build"
+    name = buildTypeName
+    id = RelativeId(buildTypeName.toId())
 
     vcs {
         root(DslContext.settingsRoot.id!!)
@@ -75,10 +77,13 @@ object MasterBuild : BuildType({
     }
 
     features {}
-})
+}
 
-object PullRequestBuild : BuildType({
-    name = "Pull Request Build"
+val pullRequestBuild = BuildType{
+
+    val buildTypeName = "Pull Request Build"
+    name = buildTypeName
+    id = RelativeId(buildTypeName.toId())
 
     vcs {
         root(DslContext.settingsRoot)
@@ -121,7 +126,7 @@ object PullRequestBuild : BuildType({
             }
         }
     }
-})
+}
 
 // Doing this, fixes this error: Kotlin:
 // Object DeployBuild captures the script class instance. Try to use class or anonymous object instead
@@ -129,10 +134,8 @@ object PullRequestBuild : BuildType({
 val deployBuild = BuildType{
 
     val buildTypeName = "Deploy Build"
-
     name = buildTypeName
     id = RelativeId(buildTypeName.toId())
-
 
     vcs {
         root(DslContext.settingsRoot)
@@ -140,10 +143,10 @@ val deployBuild = BuildType{
         excludeDefaultBranchChanges = true
     }
 
-    buildNumberPattern = MasterBuild.depParamRefs.buildNumber.toString()
+    buildNumberPattern = masterBuild.depParamRefs.buildNumber.toString()
 
     dependencies {
-        snapshot(MasterBuild) {
+        snapshot(masterBuild) {
             onDependencyFailure = FailureAction.FAIL_TO_START
             onDependencyCancel = FailureAction.CANCEL
         }
@@ -166,8 +169,8 @@ val deployBuild = BuildType{
 
 val builds: ArrayList<BuildType> = arrayListOf()
 
-builds.add(MasterBuild)
-builds.add(PullRequestBuild)
+builds.add(masterBuild)
+builds.add(pullRequestBuild)
 builds.add(deployBuild)
 
 val project = Project {
