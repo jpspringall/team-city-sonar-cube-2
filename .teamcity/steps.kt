@@ -131,7 +131,7 @@ object CommonSteps {
                 name = "Move $workingDirectory"
                 scriptContent = """
                 #!/bin/bash
-                mv -v ./$workingDirectory/ ./
+                mv -v $workingDirectory/ ./
             """.trimIndent()
             }
 
