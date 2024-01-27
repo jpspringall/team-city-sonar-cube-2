@@ -128,8 +128,10 @@ object PullRequestBuild : BuildType({
 // https://stackoverflow.com/questions/17516930/how-to-create-an-instance-of-anonymous-class-of-abstract-class-in-kotlin
 val deployBuild = BuildType{
 
-    name = "Deploy Build"
-    id = RelativeId("Deploy Build".toId())
+    val buildTypeName = "Deploy Build"
+
+    name = buildTypeName
+    id = RelativeId(buildTypeName.toId())
 
 
     vcs {
