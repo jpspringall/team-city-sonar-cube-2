@@ -150,6 +150,7 @@ object CommonSteps {
                 counter=%build.counter%
                 echo "Counter is: ${'$'}counter"
                 ls
+                git status
                 echo "Output sonar-qube-test:"
                 cat ./README.md
                 echo "Output private-https-test:"
