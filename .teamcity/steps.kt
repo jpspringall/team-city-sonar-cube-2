@@ -132,7 +132,7 @@ object CommonSteps {
                 scriptContent = """
                 #!/bin/bash
                 ls
-                mv -v /$workingDirectory/ ..
+                mv -v $workingDirectory/ ..
             """.trimIndent()
             }
 
