@@ -160,8 +160,7 @@ val deployBuild = BuildType{
     createParameters()
 
     //printDeployNumber(mainCheckoutDirectory)
-    //printAndMoveDeployNumber(mainCheckoutDirectory)
-    printAndMoveDeployNumber()
+    printAndMoveDeployNumber(mainCheckoutDirectory)
 
     triggers {
     }
