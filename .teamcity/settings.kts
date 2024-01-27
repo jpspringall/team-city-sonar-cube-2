@@ -203,10 +203,11 @@ for (bt : BuildType in project.buildTypes ) {
     }
 
     if (bt.name == "Deploy Build") {
+
+        bt.vcs.root(DslContext.settingsRoot.id!!)
         //bt.vcs.root(DslContext.settingsRoot.id!!, "+:. => $mainCheckoutDirectory")
         val vcsRootName = "RootTeamCitySonarCubeProject_TeamCitySonarPrivateHttps"
         bt.vcs.root(AbsoluteId(vcsRootName), "+:. => ./private-https-test")
-        bt.vcs.root(DslContext.settingsRoot.id!!)
 
     }
 
