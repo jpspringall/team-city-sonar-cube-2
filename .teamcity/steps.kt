@@ -138,6 +138,7 @@ object CommonSteps {
                 ls
                 rm -rf .$workingDirectory
                 ls
+                 git status
             """.trimIndent()
             }
 
