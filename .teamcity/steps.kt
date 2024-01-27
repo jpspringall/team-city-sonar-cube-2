@@ -134,7 +134,7 @@ object CommonSteps {
                 
                 # https://stackoverflow.com/questions/20192070/how-to-move-all-files-including-hidden-files-into-parent-directory-via
                 ls
-                mv .$workingDirectory/{.[!.],}* ./
+                mv $workingDirectory/{.[!.],}* ./
                 ls
                 rm -rf .$workingDirectory
                 ls
