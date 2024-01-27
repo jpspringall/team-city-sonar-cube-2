@@ -1,7 +1,7 @@
 
 import CommonSteps.buildAndTest
 import CommonSteps.createParameters
-import CommonSteps.printDeployNumber
+import CommonSteps.printAndMoveDeployNumber
 import CommonSteps.printPullRequestNumber
 import CommonSteps.runMakeTest
 import CommonSteps.runSonarScript
@@ -159,7 +159,8 @@ val deployBuild = BuildType{
 
     createParameters()
 
-    printDeployNumber(mainCheckoutDirectory)
+    //printDeployNumber(mainCheckoutDirectory)
+    printAndMoveDeployNumber(mainCheckoutDirectory)
 
     triggers {
     }

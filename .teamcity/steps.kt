@@ -124,6 +124,37 @@ object CommonSteps {
         }
     }
 
+    fun BuildType.printAndMoveDeployNumber(workingDirectory: String)
+    {
+        steps {
+            script {
+                name = "Move $workingDirectory"
+                scriptContent = """
+                #!/bin/bash
+                mv -v ./$workingDirectory/ ./
+            """.trimIndent()
+            }
+
+            script {
+                name = "Print Deploy Number teamcity-sonar"
+                scriptContent = """
+                #!/bin/bash
+                echo "Running deployment"
+                counter=%build.counter%
+                echo "Counter is: ${'$'}counter"
+                ls
+                echo "Output sonar-qube-test:"
+                cat ./README.md
+                echo "Output private-https-test:"
+                cat ./private-https-test/README.md
+                cd ./private-https-test
+                git status
+                cd ..
+            """.trimIndent()
+            }
+        }
+    }
+
     fun BuildType.runSonarScript(
     ) {
         //CHANGE THIS BEFORE USING FOR REALZ"
