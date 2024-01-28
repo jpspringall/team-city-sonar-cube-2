@@ -134,10 +134,11 @@ object CommonSteps {
                 
                 # https://unix.stackexchange.com/questions/19344/move-folder-content-up-one-level
                 # https://stackoverflow.com/questions/20192070/how-to-move-all-files-including-hidden-files-into-parent-directory-via
+                echo "Before"
                 ls
                 mv $workingDirectory/{.[!.],}* ./
-                ls
-                rm -rf .$workingDirectory
+                rmdir $workingDirectory
+                echo "After"
                 ls
                  git status
             """.trimIndent()
