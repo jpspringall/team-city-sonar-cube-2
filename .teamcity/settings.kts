@@ -2,6 +2,7 @@
 import CommonSteps.buildAndTest
 import CommonSteps.createParameters
 import CommonSteps.printDeployNumber
+import CommonSteps.printNotifyNumber
 import CommonSteps.printPullRequestNumber
 import CommonSteps.runMakeTest
 import CommonSteps.runSonarScript
@@ -157,8 +158,8 @@ object DeployUATBuild : BuildType({
     features {}
 })
 
-object DeployProdBuild : BuildType({
-    name = "Deploy Prod Build"
+object NotifyUATBuild : BuildType({
+    name = "Notify UAT Build"
 
     vcs {
         root(DslContext.settingsRoot)
@@ -181,7 +182,135 @@ object DeployProdBuild : BuildType({
 
     createParameters()
 
+    printNotifyNumber("UAT")
+
+    triggers {
+    }
+
+    features {}
+})
+
+object DeployCanaryBuild : BuildType({
+    name = "Deploy Canary Build"
+
+    vcs {
+        root(DslContext.settingsRoot)
+        cleanCheckout = true
+        excludeDefaultBranchChanges = true
+    }
+
+    buildNumberPattern = MasterBuild.depParamRefs.buildNumber.toString()
+
+    dependencies {
+        snapshot(DeployUATBuild) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+            onDependencyCancel = FailureAction.CANCEL
+        }
+    }
+
+    params {
+        param("git.branch.specification", "")
+    }
+
+    createParameters()
+
+    printDeployNumber("Canary")
+
+    triggers {
+    }
+
+    features {}
+})
+
+object NotifyCanaryBuild : BuildType({
+    name = "Notify Canary Build"
+
+    vcs {
+        root(DslContext.settingsRoot)
+        cleanCheckout = true
+        excludeDefaultBranchChanges = true
+    }
+
+    buildNumberPattern = MasterBuild.depParamRefs.buildNumber.toString()
+
+    dependencies {
+        snapshot(DeployCanaryBuild) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+            onDependencyCancel = FailureAction.CANCEL
+        }
+    }
+
+    params {
+        param("git.branch.specification", "")
+    }
+
+    createParameters()
+
+    printNotifyNumber("Canary")
+
+    triggers {
+    }
+
+    features {}
+})
+
+object DeployProdBuild : BuildType({
+    name = "Deploy Prod Build"
+
+    vcs {
+        root(DslContext.settingsRoot)
+        cleanCheckout = true
+        excludeDefaultBranchChanges = true
+    }
+
+    buildNumberPattern = MasterBuild.depParamRefs.buildNumber.toString()
+
+    dependencies {
+        snapshot(DeployCanaryBuild) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+            onDependencyCancel = FailureAction.CANCEL
+        }
+    }
+
+    params {
+        param("git.branch.specification", "")
+    }
+
+    createParameters()
+
     printDeployNumber("Prod")
+
+    triggers {
+    }
+
+    features {}
+})
+
+object NotifyProdBuild : BuildType({
+    name = "Notify Prod Build"
+
+    vcs {
+        root(DslContext.settingsRoot)
+        cleanCheckout = true
+        excludeDefaultBranchChanges = true
+    }
+
+    buildNumberPattern = MasterBuild.depParamRefs.buildNumber.toString()
+
+    dependencies {
+        snapshot(DeployProdBuild) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+            onDependencyCancel = FailureAction.CANCEL
+        }
+    }
+
+    params {
+        param("git.branch.specification", "")
+    }
+
+    createParameters()
+
+    printNotifyNumber("Prod")
 
     triggers {
     }
@@ -194,7 +323,11 @@ val builds: ArrayList<BuildType> = arrayListOf()
 builds.add(MasterBuild)
 builds.add(PullRequestBuild)
 builds.add(DeployUATBuild)
+builds.add(NotifyUATBuild)
+builds.add(DeployCanaryBuild)
+builds.add(NotifyCanaryBuild)
 builds.add(DeployProdBuild)
+builds.add(NotifyProdBuild)
 
 val project = Project {
     builds.forEach{

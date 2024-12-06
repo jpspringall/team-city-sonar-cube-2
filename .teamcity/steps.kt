@@ -105,8 +105,24 @@ object CommonSteps {
                 scriptContent = """
                 #!/bin/bash
                 echo "Running deployment in environment: $environment"
-                counter=%build.counter%
-                echo "Counter is: ${'$'}counter"
+                counter=%build.number%
+                echo "Number is: ${'$'}counter"
+            """.trimIndent()
+            }
+        }
+    }
+
+    fun BuildType.printNotifyNumber(
+        environment : String
+    ) {
+        steps {
+            script {
+                name = "Print Notify Number teamcity-sonar"
+                scriptContent = """
+                #!/bin/bash
+                echo "Running notify in environment: $environment"
+                counter=%build.number%
+                echo "Number is: ${'$'}counter"
             """.trimIndent()
             }
         }
