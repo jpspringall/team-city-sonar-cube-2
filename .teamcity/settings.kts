@@ -198,6 +198,7 @@ val builds: ArrayList<BuildType> = arrayListOf()
 builds.add(MasterBuild)
 builds.add(PullRequestBuild)
 builds.add(DeployUATBuild)
+builds.add(DeployProdBuild)
 
 val project = Project {
     builds.forEach{
