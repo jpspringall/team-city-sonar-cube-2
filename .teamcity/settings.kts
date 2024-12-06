@@ -152,8 +152,6 @@ object DeployUATBuild : BuildType({
     printDeployNumber("UAT")
 
     triggers {
-        vcs {
-        }
     }
 
     features {}
@@ -186,8 +184,6 @@ object DeployProdBuild : BuildType({
     printDeployNumber("Prod")
 
     triggers {
-        vcs {
-        }
     }
 
     features {}
