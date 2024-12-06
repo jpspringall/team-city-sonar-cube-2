@@ -344,7 +344,6 @@ val project = Project {
 
 
 for (bt : BuildType in project.buildTypes ) {
-    bt.paused = false
     val gitSpec = bt.params.findRawParam("git.branch.specification")
     if (gitSpec != null && gitSpec.value.isNotBlank()) {
         bt.vcs.branchFilter = """
