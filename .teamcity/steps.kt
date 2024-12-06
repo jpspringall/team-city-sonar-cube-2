@@ -97,13 +97,14 @@ object CommonSteps {
     }
 
     fun BuildType.printDeployNumber(
+        environment : String
     ) {
         steps {
             script {
                 name = "Print Deploy Number teamcity-sonar"
                 scriptContent = """
                 #!/bin/bash
-                echo "Running deployment"
+                echo "Running deployment in environment: $environment"
                 counter=%build.counter%
                 echo "Counter is: ${'$'}counter"
             """.trimIndent()

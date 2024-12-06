@@ -12,7 +12,6 @@ import jetbrains.buildServer.configs.kotlin.buildFeatures.dockerSupport
 import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.ui.add
-import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 
 /*
 The settings script is an entry point for defining a TeamCity
@@ -37,43 +36,6 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 */
 
 version = "2024.03"
-
-object MasterBuild : BuildType({
-    name = "Master Build"
-
-    vcs {
-        root(DslContext.settingsRoot.id!!)
-        cleanCheckout = true
-        excludeDefaultBranchChanges = true
-    }
-
-    params {
-        param("git.branch.specification", "")
-    }
-
-    createParameters()
-
-    printPullRequestNumber()
-
-    runMakeTest()
-
-    buildAndTest()
-
-    runSonarScript()
-
-    triggers {
-        vcs {
-        }
-    }
-
-    features {
-        dockerSupport {
-            loginToRegistry = on {
-                dockerRegistryId = "PROJECT_EXT_2"
-            }
-        }
-    }
-})
 
 object PullRequestBuild : BuildType({
     name = "Pull Request Build"
@@ -126,8 +88,45 @@ object PullRequestBuild : BuildType({
     }
 })
 
-object DeployBuild : BuildType({
-    name = "Deploy Build"
+object MasterBuild : BuildType({
+    name = "Master Build"
+
+    vcs {
+        root(DslContext.settingsRoot.id!!)
+        cleanCheckout = true
+        excludeDefaultBranchChanges = true
+    }
+
+    params {
+        param("git.branch.specification", "")
+    }
+
+    createParameters()
+
+    printPullRequestNumber()
+
+    runMakeTest()
+
+    buildAndTest()
+
+    runSonarScript()
+
+    triggers {
+        vcs {
+        }
+    }
+
+    features {
+        dockerSupport {
+            loginToRegistry = on {
+                dockerRegistryId = "PROJECT_EXT_2"
+            }
+        }
+    }
+})
+
+object DeployUATBuild : BuildType({
+    name = "Deploy UAT Build"
 
     vcs {
         root(DslContext.settingsRoot)
@@ -150,7 +149,41 @@ object DeployBuild : BuildType({
 
     createParameters()
 
-    printDeployNumber()
+    printDeployNumber("UAT")
+
+    triggers {
+        vcs {
+        }
+    }
+
+    features {}
+})
+
+object DeployProdBuild : BuildType({
+    name = "Deploy Prod Build"
+
+    vcs {
+        root(DslContext.settingsRoot)
+        cleanCheckout = true
+        excludeDefaultBranchChanges = true
+    }
+
+    buildNumberPattern = MasterBuild.depParamRefs.buildNumber.toString()
+
+    dependencies {
+        snapshot(DeployUATBuild) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+            onDependencyCancel = FailureAction.CANCEL
+        }
+    }
+
+    params {
+        param("git.branch.specification", "")
+    }
+
+    createParameters()
+
+    printDeployNumber("Prod")
 
     triggers {
         vcs {
@@ -164,7 +197,7 @@ val builds: ArrayList<BuildType> = arrayListOf()
 
 builds.add(MasterBuild)
 builds.add(PullRequestBuild)
-builds.add(DeployBuild)
+builds.add(DeployUATBuild)
 
 val project = Project {
     builds.forEach{
