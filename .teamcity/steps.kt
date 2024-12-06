@@ -1,10 +1,6 @@
 
 import jetbrains.buildServer.configs.kotlin.BuildType
-import jetbrains.buildServer.configs.kotlin.buildSteps.ExecBuildStep
-import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
-import jetbrains.buildServer.configs.kotlin.buildSteps.dotnetBuild
-import jetbrains.buildServer.configs.kotlin.buildSteps.exec
-import jetbrains.buildServer.configs.kotlin.buildSteps.script
+import jetbrains.buildServer.configs.kotlin.buildSteps.*
 
 object CommonSteps {
 
@@ -100,50 +96,9 @@ object CommonSteps {
         }
     }
 
-    fun BuildType.printDeployNumber(workingDirectory: String)
-     {
+    fun BuildType.printDeployNumber(
+    ) {
         steps {
-            script {
-                name = "Print Deploy Number teamcity-sonar"
-                workingDir = workingDirectory
-                scriptContent = """
-                #!/bin/bash
-                echo "Running deployment"
-                counter=%build.counter%
-                echo "Counter is: ${'$'}counter"
-                ls ..
-                echo "Output sonar-qube-test:"
-                cat ./README.md
-                echo "Output private-https-test:"
-                cat ../private-https-test/README.md
-                cd ../private-https-test
-                git status
-                cd ..
-            """.trimIndent()
-            }
-        }
-    }
-
-    fun BuildType.printAndMoveDeployNumber(workingDirectory: String)
-    {
-        steps {
-            script {
-                name = "Move $workingDirectory"
-                scriptContent = """
-                #!/bin/bash
-                
-                # https://unix.stackexchange.com/questions/19344/move-folder-content-up-one-level
-                # https://stackoverflow.com/questions/20192070/how-to-move-all-files-including-hidden-files-into-parent-directory-via
-                echo "Before"
-                ls
-                mv $workingDirectory/{.[!.],}* ./
-                rmdir $workingDirectory
-                echo "After"
-                ls
-                 git status
-            """.trimIndent()
-            }
-
             script {
                 name = "Print Deploy Number teamcity-sonar"
                 scriptContent = """
@@ -151,15 +106,6 @@ object CommonSteps {
                 echo "Running deployment"
                 counter=%build.counter%
                 echo "Counter is: ${'$'}counter"
-                ls
-                git status
-                echo "Output sonar-qube-test:"
-                cat ./README.md
-                echo "Output private-https-test:"
-                cat ./private-https-test/README.md
-                cd ./private-https-test
-                git status
-                cd ..
             """.trimIndent()
             }
         }
@@ -172,16 +118,17 @@ object CommonSteps {
         //CHANGE THIS BEFORE USING FOR REALZ"
         steps {
             exec {
-                enabled = false
+                enabled = true
                 name = "Run Sonar Script"
                 path = "ci/run-sonar.sh"
                 arguments =
                     """-s ""%env.sonar_server%"" -u ""%env.sonar_user%"" -p ""%env.sonar_password%"" -n ""%teamcity.pullRequest.number%"" -v ""%build.counter%"""""
                 formatStderrAsError = true
                 dockerImagePlatform = ExecBuildStep.ImagePlatform.Linux
-                dockerPull = true
-                dockerImage = "${imageRepository}/dotnet-sonar-scanner:5.8.0" //CHECK IMAGE NAME FOR REALZ
+                dockerPull = false
+                dockerImage = "${imageRepository}/dotnet-sonar-scanner:9.0.1" //CHECK IMAGE NAME FOR REALZ
                 dockerRunParameters = """
+                    --network=host
                     -v %system.teamcity.build.checkoutDir%/test-results:/test-results
                 """.trimIndent()
             }
@@ -192,7 +139,7 @@ object CommonSteps {
     ) {
         steps {
             exec {
-                enabled = true
+                enabled = false
                 name = "Run End 2 End Tests"
                 workingDir = "./"
                 path = "./ci/run-end-2-end-test.sh"

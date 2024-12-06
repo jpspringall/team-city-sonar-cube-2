@@ -1,24 +1,18 @@
 
 import CommonSteps.buildAndTest
 import CommonSteps.createParameters
-import CommonSteps.printAndMoveDeployNumber
+import CommonSteps.printDeployNumber
 import CommonSteps.printPullRequestNumber
 import CommonSteps.runMakeTest
 import CommonSteps.runSonarScript
-import jetbrains.buildServer.configs.kotlin.AbsoluteId
-import jetbrains.buildServer.configs.kotlin.BuildType
-import jetbrains.buildServer.configs.kotlin.DslContext
-import jetbrains.buildServer.configs.kotlin.FailureAction
-import jetbrains.buildServer.configs.kotlin.Project
-import jetbrains.buildServer.configs.kotlin.RelativeId
+import jetbrains.buildServer.configs.kotlin.*
 import jetbrains.buildServer.configs.kotlin.buildFeatures.PullRequests
 import jetbrains.buildServer.configs.kotlin.buildFeatures.commitStatusPublisher
+import jetbrains.buildServer.configs.kotlin.buildFeatures.dockerSupport
 import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
-import jetbrains.buildServer.configs.kotlin.project
-import jetbrains.buildServer.configs.kotlin.toId
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.ui.add
-import jetbrains.buildServer.configs.kotlin.version
+import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 
 /*
 The settings script is an entry point for defining a TeamCity
@@ -42,14 +36,10 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 'Debug' option is available in the context menu for the task.
 */
 
-version = "2023.11"
+version = "2024.03"
 
-val mainCheckoutDirectory = "./sonar-qube-test"
-
-val masterBuild = BuildType{
-val buildTypeName = "Master Build"
-    name = buildTypeName
-    id = RelativeId(buildTypeName.toId())
+object MasterBuild : BuildType({
+    name = "Master Build"
 
     vcs {
         root(DslContext.settingsRoot.id!!)
@@ -76,14 +66,17 @@ val buildTypeName = "Master Build"
         }
     }
 
-    features {}
-}
+    features {
+        dockerSupport {
+            loginToRegistry = on {
+                dockerRegistryId = "PROJECT_EXT_2"
+            }
+        }
+    }
+})
 
-val pullRequestBuild = BuildType{
-
-    val buildTypeName = "Pull Request Build"
-    name = buildTypeName
-    id = RelativeId(buildTypeName.toId())
+object PullRequestBuild : BuildType({
+    name = "Pull Request Build"
 
     vcs {
         root(DslContext.settingsRoot)
@@ -110,15 +103,20 @@ val pullRequestBuild = BuildType{
     }
 
     features {
+        dockerSupport {
+            loginToRegistry = on {
+                dockerRegistryId = "PROJECT_EXT_2"
+            }
+        }
         commitStatusPublisher {
-            vcsRootExtId = "${DslContext.settingsRoot.id}"
+            vcsRootExtId = "${DslContext.settingsRootId}"
             publisher = github {
                 githubUrl = "https://api.github.com"
                 authType = vcsRoot()
             }
         }
         pullRequests {
-            vcsRootExtId = "${DslContext.settingsRoot.id}"
+            vcsRootExtId = "${DslContext.settingsRootId}"
             provider = github {
                 authType = vcsRoot()
                 filterSourceBranch = "refs/pull/*/merge"
@@ -126,16 +124,10 @@ val pullRequestBuild = BuildType{
             }
         }
     }
-}
+})
 
-// Doing this, fixes this error: Kotlin:
-// Object DeployBuild captures the script class instance. Try to use class or anonymous object instead
-// https://stackoverflow.com/questions/17516930/how-to-create-an-instance-of-anonymous-class-of-abstract-class-in-kotlin
-val deployBuild = BuildType{
-
-    val buildTypeName = "Deploy Build"
-    name = buildTypeName
-    id = RelativeId(buildTypeName.toId())
+object DeployBuild : BuildType({
+    name = "Deploy Build"
 
     vcs {
         root(DslContext.settingsRoot)
@@ -143,10 +135,10 @@ val deployBuild = BuildType{
         excludeDefaultBranchChanges = true
     }
 
-    buildNumberPattern = masterBuild.depParamRefs.buildNumber.toString()
+    buildNumberPattern = MasterBuild.depParamRefs.buildNumber.toString()
 
     dependencies {
-        snapshot(masterBuild) {
+        snapshot(MasterBuild) {
             onDependencyFailure = FailureAction.FAIL_TO_START
             onDependencyCancel = FailureAction.CANCEL
         }
@@ -154,25 +146,25 @@ val deployBuild = BuildType{
 
     params {
         param("git.branch.specification", "")
-        param("https.private.root.build.step", "%https.private.root%")
     }
 
     createParameters()
 
-    //printDeployNumber(mainCheckoutDirectory)
-    printAndMoveDeployNumber(mainCheckoutDirectory)
+    printDeployNumber()
 
     triggers {
+        vcs {
+        }
     }
 
     features {}
-}
+})
 
 val builds: ArrayList<BuildType> = arrayListOf()
 
-builds.add(masterBuild)
-builds.add(pullRequestBuild)
-builds.add(deployBuild)
+builds.add(MasterBuild)
+builds.add(PullRequestBuild)
+builds.add(DeployBuild)
 
 val project = Project {
     builds.forEach{
@@ -182,7 +174,9 @@ val project = Project {
     buildTypesOrder = builds
 }
 
+
 for (bt : BuildType in project.buildTypes ) {
+    bt.paused = false
     val gitSpec = bt.params.findRawParam("git.branch.specification")
     if (gitSpec != null && gitSpec.value.isNotBlank()) {
         bt.vcs.branchFilter = """
@@ -200,16 +194,6 @@ for (bt : BuildType in project.buildTypes ) {
             }
         }
     }
-
-    if (bt.name == "Deploy Build") {
-
-
-        bt.vcs.root(DslContext.settingsRoot.id!!, "+:. => $mainCheckoutDirectory")
-        val vcsRootName = "RootTeamCitySonarCubeProject_TeamCitySonarPrivateHttps"
-        bt.vcs.root(AbsoluteId(vcsRootName), "+:. => ./private-https-test")
-
-    }
-
 //    if (bt.name == "Pull Request Build" || bt.name == "Master Build")
 //    {
 //        bt.features.add {  xmlReport {
