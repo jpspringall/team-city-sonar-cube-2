@@ -11,7 +11,6 @@ import jetbrains.buildServer.configs.kotlin.buildFeatures.PullRequests
 import jetbrains.buildServer.configs.kotlin.buildFeatures.commitStatusPublisher
 import jetbrains.buildServer.configs.kotlin.buildFeatures.dockerSupport
 import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
-import jetbrains.buildServer.configs.kotlin.triggers.finishBuildTrigger
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.ui.add
 
@@ -161,7 +160,7 @@ object DeployUATBuild : BuildType({
 
 object NotifyUATBuild : BuildType({
     name = "Notify UAT Build"
-    paused = true
+
     vcs {
         root(DslContext.settingsRoot)
         cleanCheckout = true
@@ -225,7 +224,7 @@ object DeployCanaryBuild : BuildType({
 
 object NotifyCanaryBuild : BuildType({
     name = "Notify Canary Build"
-    paused = true
+
     vcs {
         root(DslContext.settingsRoot)
         cleanCheckout = true
@@ -314,10 +313,6 @@ object NotifyProdBuild : BuildType({
     printNotifyNumber("Prod")
 
     triggers {
-        finishBuildTrigger {
-            buildType = DeployProdBuild.id.toString()
-            successfulOnly = true
-        }
     }
 
     features {}
@@ -344,6 +339,7 @@ val project = Project {
 
 
 for (bt : BuildType in project.buildTypes ) {
+    bt.paused = false
     val gitSpec = bt.params.findRawParam("git.branch.specification")
     if (gitSpec != null && gitSpec.value.isNotBlank()) {
         bt.vcs.branchFilter = """
